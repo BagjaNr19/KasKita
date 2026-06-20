@@ -194,7 +194,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
   Widget _buildCategoryDropdown() {
     return DropdownButtonFormField<TransactionCategory>(
-      value: _category,
+      initialValue: _category,
       decoration: const InputDecoration(
         labelText: 'Kategori',
         prefixIcon: Icon(Icons.category_rounded,
@@ -284,7 +284,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
               height: 120,
               decoration: BoxDecoration(
                 color: _hasProof
-                    ? AppColors.success.withOpacity(0.05)
+                    ? AppColors.success.withValues(alpha: 0.05)
                     : AppColors.surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
@@ -316,7 +316,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                         fontWeight: _hasProof ? FontWeight.w600 : FontWeight.w400,
                       ),
                     ),
-                    Text(
+                    const Text(
                       '(Fitur dummy)',
                       style: TextStyle(
                         color: AppColors.textHint,

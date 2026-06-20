@@ -8,6 +8,9 @@ import 'features/splash/splash_screen.dart';
 import 'features/onboarding/onboarding_screen.dart';
 import 'features/auth/login_screen.dart';
 import 'features/dashboard/dashboard_screen.dart';
+import 'features/residents/residents_screen.dart';
+import 'features/cash/cash_screen.dart';
+import 'features/billing/billing_screen.dart';
 import 'features/transactions/transactions_screen.dart';
 import 'features/transactions/transaction_detail_screen.dart';
 import 'features/transactions/add_transaction_screen.dart';
@@ -18,16 +21,19 @@ import 'features/profile/profile_screen.dart';
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authStateProvider);
-
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: AppRoutes.splash,
     redirect: (context, state) {
+      final authState = ref.read(authStateProvider);
       final isLoggedIn = authState.currentUser != null;
       final isOnSplash = state.matchedLocation == AppRoutes.splash;
       final isOnOnboarding = state.matchedLocation == AppRoutes.onboarding;
       final isOnLogin = state.matchedLocation == AppRoutes.login;
+
+      if (isLoggedIn && (isOnSplash || isOnOnboarding || isOnLogin)) {
+        return AppRoutes.dashboard;
+      }
 
       if (isOnSplash || isOnOnboarding || isOnLogin) return null;
       if (!isLoggedIn) return AppRoutes.login;
@@ -51,11 +57,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const DashboardScreen(),
       ),
       GoRoute(
+        path: AppRoutes.residents,
+        builder: (context, state) => const ResidentsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.cash,
+        builder: (context, state) => const CashScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.billing,
+        builder: (context, state) => const BillingScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.transactions,
         builder: (context, state) => const TransactionsScreen(),
       ),
-      // NOTE: addTransaction must come BEFORE transactionDetail to avoid
-      // '/transactions/add' being matched as ':id = add'
       GoRoute(
         path: AppRoutes.addTransaction,
         builder: (context, state) => const AddTransactionScreen(),

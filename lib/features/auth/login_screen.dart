@@ -15,14 +15,13 @@ class LoginScreen extends ConsumerStatefulWidget {
 }
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
-  UserRole _selectedRole = UserRole.warga;
+  UserRole _selectedRole = UserRole.admin;
   final _formKey = GlobalKey<FormState>();
 
   final _roles = [
-    (role: UserRole.warga, label: AppStrings.roleWarga, icon: Icons.person_outline_rounded),
-    (role: UserRole.bendahara, label: AppStrings.roleBendahara, icon: Icons.account_balance_wallet_outlined),
-    (role: UserRole.ketua, label: AppStrings.roleKetua, icon: Icons.admin_panel_settings_outlined),
     (role: UserRole.admin, label: AppStrings.roleAdmin, icon: Icons.manage_accounts_outlined),
+    (role: UserRole.bendahara, label: AppStrings.roleBendahara, icon: Icons.account_balance_wallet_outlined),
+    (role: UserRole.warga, label: AppStrings.roleWarga, icon: Icons.person_outline_rounded),
   ];
 
   @override
@@ -126,7 +125,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           duration: const Duration(milliseconds: 200),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary.withOpacity(0.08) : Colors.white,
+            color: isSelected ? AppColors.primary.withValues(alpha: 0.08) : Colors.white,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: isSelected ? AppColors.primary : AppColors.border,
@@ -140,7 +139,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 height: 48,
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? AppColors.primary.withOpacity(0.15)
+                      ? AppColors.primary.withValues(alpha: 0.15)
                       : AppColors.surface,
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -226,13 +225,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.info.withOpacity(0.08),
+        color: AppColors.info.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.info.withOpacity(0.2)),
+        border: Border.all(color: AppColors.info.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline_rounded, color: AppColors.info, size: 20),
+          const Icon(Icons.info_outline_rounded, color: AppColors.info, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Text(

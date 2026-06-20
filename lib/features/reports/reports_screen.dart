@@ -6,7 +6,6 @@ import '../../core/theme/app_colors.dart';
 import '../../core/constants/app_routes.dart';
 import '../../core/utils/currency_formatter.dart';
 import '../../data/models/app_user.dart';
-import '../../data/dummy/dummy_chart_data.dart';
 import '../../data/dummy/dummy_transactions.dart';
 import '../../data/models/transaction_model.dart';
 import '../../features/auth/auth_provider.dart';
@@ -22,8 +21,8 @@ class ReportsScreen extends ConsumerStatefulWidget {
 
 class _ReportsScreenState extends ConsumerState<ReportsScreen> {
   int _selectedMonth = DateTime.now().month;
-  int _selectedYear = DateTime.now().year;
-  int _navIndex = 3;
+  final int _selectedYear = DateTime.now().year;
+  final int _navIndex = 3;
 
   final _months = [
     'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
@@ -41,30 +40,33 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
       .where((t) => t.type == TransactionType.expense)
       .fold(0.0, (s, t) => s + t.amount);
 
-  void _onNavTap(int index) {
-    setState(() => _navIndex = index);
-    switch (index) {
-      case 0:
-        context.go(AppRoutes.dashboard);
-        break;
-      case 1:
-        context.go(AppRoutes.transactions);
-        break;
-      case 2:
-        context.go(AppRoutes.dues);
-        break;
-      case 3:
-        break;
-      case 4:
-        context.go(AppRoutes.profile);
-        break;
+  void _onNavTap(int index, UserRole role) {
+    if (index == 3) return;
+
+    if (role == UserRole.admin) {
+      if (index == 0) context.go(AppRoutes.dashboard);
+      if (index == 1) context.go(AppRoutes.residents);
+      if (index == 2) context.go(AppRoutes.cash);
+      if (index == 4) context.go(AppRoutes.profile);
+    } else if (role == UserRole.bendahara) {
+      if (index == 0) context.go(AppRoutes.dashboard);
+      if (index == 1) context.go(AppRoutes.transactions);
+      if (index == 2) context.go(AppRoutes.billing);
+      if (index == 4) context.go(AppRoutes.profile);
+    } else if (role == UserRole.warga) {
+      if (index == 0) context.go(AppRoutes.dashboard);
+      if (index == 1) context.go(AppRoutes.cash);
+      if (index == 2) context.go(AppRoutes.dues);
+      if (index == 4) context.go(AppRoutes.profile);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final user = ref.watch(authStateProvider).currentUser;
-    final saldoAwal = 2000000.0;
+    if (user == null) return const Scaffold();
+    
+    const saldoAwal = 2000000.0;
     final saldoAkhir = saldoAwal + _income - _expense;
 
     return Scaffold(
@@ -73,7 +75,7 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
         title: const Text('Laporan Keuangan'),
         automaticallyImplyLeading: false,
         actions: [
-          if (user != null && user.role.canExportReport)
+          if (user.role.canExportReport)
             Padding(
               padding: const EdgeInsets.only(right: 16),
               child: OutlinedButton.icon(
@@ -108,7 +110,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
       ),
       bottomNavigationBar: CustomBottomNav(
         currentIndex: _navIndex,
-        onTap: _onNavTap,
+        onTap: (i) => _onNavTap(i, user.role),
+        role: user.role,
       ),
     );
   }

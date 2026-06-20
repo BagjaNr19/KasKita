@@ -1,45 +1,40 @@
 import '../models/app_user.dart';
 
 class DummyUsers {
-  static const AppUser warga = AppUser(
-    id: 'u001',
+  static const admin = AppUser(
+    id: 'usr_001',
     name: 'Budi Santoso',
-    email: 'budi@warga.id',
-    role: UserRole.warga,
-    rtRw: 'RT 03 / RW 07',
-    houseNumber: 'No. 12',
-    phoneNumber: '0812-3456-7890',
-  );
-
-  static const AppUser bendahara = AppUser(
-    id: 'u002',
-    name: 'Siti Aminah',
-    email: 'siti@rt03.id',
-    role: UserRole.bendahara,
-    rtRw: 'RT 03 / RW 07',
-    houseNumber: 'No. 05',
-    phoneNumber: '0813-2222-3333',
-  );
-
-  static const AppUser ketua = AppUser(
-    id: 'u003',
-    name: 'H. Sukirman',
-    email: 'ketua@rt03.id',
-    role: UserRole.ketua,
-    rtRw: 'RT 03 / RW 07',
-    houseNumber: 'No. 01',
-    phoneNumber: '0811-9999-8888',
-  );
-
-  static const AppUser admin = AppUser(
-    id: 'u004',
-    name: 'Admin Kaskita',
     email: 'admin@kaskita.id',
     role: UserRole.admin,
-    rtRw: 'RT 03 / RW 07',
-    houseNumber: '-',
-    phoneNumber: '0800-0000-0000',
+    houseNumber: 'A-01',
+    phoneNumber: '081234567890',
   );
 
-  static const List<AppUser> all = [warga, bendahara, ketua, admin];
+  static const bendahara = AppUser(
+    id: 'usr_002',
+    name: 'Siti Aminah',
+    email: 'bendahara@kaskita.id',
+    role: UserRole.bendahara,
+    houseNumber: 'A-02',
+    phoneNumber: '081234567891',
+  );
+
+  static const warga = AppUser(
+    id: 'usr_003',
+    name: 'Agus Pratama',
+    email: 'warga@kaskita.id',
+    role: UserRole.warga,
+    houseNumber: 'B-05',
+    phoneNumber: '081234567892',
+  );
+
+  static const List<AppUser> all = [admin, bendahara, warga];
+
+  static AppUser? findByEmail(String email) {
+    try {
+      return all.firstWhere((u) => u.email == email);
+    } catch (e) {
+      return null;
+    }
+  }
 }

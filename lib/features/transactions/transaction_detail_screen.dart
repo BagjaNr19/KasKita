@@ -64,7 +64,7 @@ class TransactionDetailScreen extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -96,7 +96,7 @@ class TransactionDetailScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
@@ -172,8 +172,8 @@ class TransactionDetailScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: t.hasProof
-                      ? AppColors.success.withOpacity(0.1)
-                      : AppColors.warning.withOpacity(0.1),
+                      ? AppColors.success.withValues(alpha: 0.1)
+                      : AppColors.warning.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -196,7 +196,7 @@ class TransactionDetailScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: AppColors.border),
               ),
-              child: Center(
+              child: const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -205,7 +205,7 @@ class TransactionDetailScreen extends StatelessWidget {
                       size: 48,
                       color: AppColors.textHint,
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     Text(
                       'Bukti transaksi tersedia',
                       style: TextStyle(
@@ -213,7 +213,7 @@ class TransactionDetailScreen extends StatelessWidget {
                         fontSize: 13,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       '(Tampilan dummy)',
                       style: TextStyle(
@@ -229,15 +229,15 @@ class TransactionDetailScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.warning.withOpacity(0.05),
+                color: AppColors.warning.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.warning.withOpacity(0.2)),
+                border: Border.all(color: AppColors.warning.withValues(alpha: 0.2)),
               ),
-              child: Row(
+              child: const Row(
                 children: [
                   Icon(Icons.info_outline_rounded,
                       color: AppColors.warning, size: 20),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       'Tidak ada bukti untuk transaksi ini.',

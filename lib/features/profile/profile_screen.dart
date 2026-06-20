@@ -15,31 +15,33 @@ class ProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
-  int _navIndex = 4;
+  final int _navIndex = 4;
 
-  void _onNavTap(int index) {
-    setState(() => _navIndex = index);
-    switch (index) {
-      case 0:
-        context.go(AppRoutes.dashboard);
-        break;
-      case 1:
-        context.go(AppRoutes.transactions);
-        break;
-      case 2:
-        context.go(AppRoutes.dues);
-        break;
-      case 3:
-        context.go(AppRoutes.reports);
-        break;
-      case 4:
-        break;
+  void _onNavTap(int index, UserRole role) {
+    if (index == 4) return;
+    
+    if (role == UserRole.admin) {
+      if (index == 0) context.go(AppRoutes.dashboard);
+      if (index == 1) context.go(AppRoutes.residents);
+      if (index == 2) context.go(AppRoutes.cash);
+      if (index == 3) context.go(AppRoutes.reports);
+    } else if (role == UserRole.bendahara) {
+      if (index == 0) context.go(AppRoutes.dashboard);
+      if (index == 1) context.go(AppRoutes.transactions);
+      if (index == 2) context.go(AppRoutes.billing);
+      if (index == 3) context.go(AppRoutes.reports);
+    } else if (role == UserRole.warga) {
+      if (index == 0) context.go(AppRoutes.dashboard);
+      if (index == 1) context.go(AppRoutes.cash);
+      if (index == 2) context.go(AppRoutes.dues);
+      if (index == 3) context.go(AppRoutes.reports);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = ref.watch(authStateProvider).currentUser!;
+    final user = ref.watch(authStateProvider).currentUser;
+    if (user == null) return const Scaffold();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -61,7 +63,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       ),
       bottomNavigationBar: CustomBottomNav(
         currentIndex: _navIndex,
-        onTap: _onNavTap,
+        onTap: (i) => _onNavTap(i, user.role),
+        role: user.role,
       ),
     );
   }
@@ -80,9 +83,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             width: 72,
             height: 72,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white.withOpacity(0.4), width: 2),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 2),
             ),
             child: Center(
               child: Text(
@@ -112,7 +115,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -129,7 +132,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   user.email,
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                   ),
                 ),
               ],
@@ -163,7 +166,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
           const SizedBox(height: 16),
           _infoRow(Icons.location_on_rounded, 'RT/RW', user.rtRw),
           const Divider(height: 24),
-          _infoRow(Icons.home_rounded, 'Nomor Rumah', user.houseNumber),
+          _infoRow(Icons.home_rounded, 'Nomor Rumah', user.houseNumber ?? '-'),
           if (user.phoneNumber != null) ...[
             const Divider(height: 24),
             _infoRow(Icons.phone_rounded, 'No. HP', user.phoneNumber!),
@@ -249,7 +252,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(icon, color: color, size: 20),
@@ -265,7 +268,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 ),
               ),
             ),
-            Icon(
+            const Icon(
               Icons.arrow_forward_ios_rounded,
               size: 14,
               color: AppColors.textHint,

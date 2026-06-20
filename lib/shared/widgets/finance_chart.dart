@@ -29,7 +29,7 @@ class _FinanceChartState extends State<FinanceChart> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -129,7 +129,7 @@ class _FinanceChartState extends State<FinanceChart> {
                   show: true,
                   horizontalInterval: 500000,
                   drawVerticalLine: false,
-                  getDrawingHorizontalLine: (value) => FlLine(
+                  getDrawingHorizontalLine: (value) => const FlLine(
                     color: AppColors.border,
                     strokeWidth: 1,
                   ),
@@ -147,7 +147,7 @@ class _FinanceChartState extends State<FinanceChart> {
                         toY: d.income,
                         color: isTouched
                             ? AppColors.income
-                            : AppColors.income.withOpacity(0.8),
+                            : AppColors.income.withValues(alpha: 0.8),
                         width: 10,
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(4),
@@ -158,7 +158,7 @@ class _FinanceChartState extends State<FinanceChart> {
                         toY: d.expense,
                         color: isTouched
                             ? AppColors.expense
-                            : AppColors.expense.withOpacity(0.8),
+                            : AppColors.expense.withValues(alpha: 0.8),
                         width: 10,
                         borderRadius: const BorderRadius.only(
                           topLeft: Radius.circular(4),

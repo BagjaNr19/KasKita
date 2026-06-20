@@ -4,9 +4,10 @@ import 'package:go_router/go_router.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/constants/app_routes.dart';
 import '../../core/utils/currency_formatter.dart';
-import '../../data/models/due_model.dart';
-import '../../data/dummy/dummy_dues.dart';
-import '../../shared/widgets/status_badge.dart';
+import '../../data/models/bill_model.dart';
+import '../../data/models/app_user.dart';
+import '../../data/dummy/dummy_bills.dart';
+import '../auth/auth_provider.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/custom_bottom_nav.dart';
 
@@ -18,73 +19,72 @@ class DuesScreen extends ConsumerStatefulWidget {
 }
 
 class _DuesScreenState extends ConsumerState<DuesScreen> {
-  DueStatus? _filterStatus; // null = all
-  int _navIndex = 2;
+  BillStatus? _filterStatus; // null = all
+  final int _navIndex = 2; // For Warga, Dues is index 2
 
-  List<DueModel> get _filtered {
-    if (_filterStatus == null) return DummyDues.all;
-    return DummyDues.all.where((d) => d.status == _filterStatus).toList();
+  List<BillModel> _getFiltered(String residentId) {
+    final myBills = DummyBills.getForResident(residentId);
+    if (_filterStatus == null) return myBills;
+    return myBills.where((d) => d.status == _filterStatus).toList();
   }
 
-  void _onNavTap(int index) {
-    setState(() => _navIndex = index);
-    switch (index) {
-      case 0:
-        context.go(AppRoutes.dashboard);
-        break;
-      case 1:
-        context.go(AppRoutes.transactions);
-        break;
-      case 2:
-        break;
-      case 3:
-        context.go(AppRoutes.reports);
-        break;
-      case 4:
-        context.go(AppRoutes.profile);
-        break;
+  void _onNavTap(int index, UserRole role) {
+    if (index == 2) return;
+    if (role == UserRole.warga) {
+      if (index == 0) context.go(AppRoutes.dashboard);
+      if (index == 1) context.go(AppRoutes.cash);
+      if (index == 3) context.go(AppRoutes.reports);
+      if (index == 4) context.go(AppRoutes.profile);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _filtered;
+    final user = ref.watch(authStateProvider).currentUser;
+    if (user == null) return const Scaffold();
+
+    final filtered = _getFiltered(user.id);
+    final myBills = DummyBills.getForResident(user.id);
+    final paidCount = myBills.where((b) => b.status == BillStatus.paid).length;
+    final pendingCount = myBills.where((b) => b.status == BillStatus.pending).length;
+    final unpaidCount = myBills.where((b) => b.status == BillStatus.unpaid).length;
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Iuran Warga'),
+        title: const Text('Iuran Saya'),
         automaticallyImplyLeading: false,
+        backgroundColor: AppColors.background,
       ),
       body: Column(
         children: [
-          _buildSummaryBar(),
+          _buildSummaryBar(paidCount, pendingCount, unpaidCount),
           _buildFilterChips(),
           Expanded(
             child: filtered.isEmpty
                 ? const EmptyState(
-                    icon: Icons.people_alt_rounded,
+                    icon: Icons.receipt_long_rounded,
                     title: 'Tidak ada data iuran',
-                    subtitle: 'Tidak ada warga dengan status ini.',
+                    subtitle: 'Tidak ada iuran dengan status ini.',
                   )
                 : ListView.separated(
                     padding: const EdgeInsets.all(20),
                     itemCount: filtered.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 10),
-                    itemBuilder: (context, index) =>
-                        _buildDueCard(filtered[index]),
+                    itemBuilder: (context, index) => _buildBillCard(filtered[index]),
                   ),
           ),
         ],
       ),
       bottomNavigationBar: CustomBottomNav(
         currentIndex: _navIndex,
-        onTap: _onNavTap,
+        onTap: (i) => _onNavTap(i, user.role),
+        role: user.role,
       ),
     );
   }
 
-  Widget _buildSummaryBar() {
+  Widget _buildSummaryBar(int paid, int pending, int unpaid) {
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 8, 20, 0),
       padding: const EdgeInsets.all(16),
@@ -96,26 +96,26 @@ class _DuesScreenState extends ConsumerState<DuesScreen> {
         children: [
           Expanded(
             child: _summaryItem(
-              '${DummyDues.paidCount}',
+              '$paid',
               'Lunas',
               Icons.check_circle_rounded,
               Colors.greenAccent,
             ),
           ),
-          Container(width: 1, height: 36, color: Colors.white.withOpacity(0.3)),
+          Container(width: 1, height: 36, color: Colors.white.withValues(alpha: 0.3)),
           Expanded(
             child: _summaryItem(
-              '${DummyDues.pendingCount}',
+              '$pending',
               'Menunggu',
               Icons.pending_rounded,
               Colors.amberAccent,
             ),
           ),
-          Container(width: 1, height: 36, color: Colors.white.withOpacity(0.3)),
+          Container(width: 1, height: 36, color: Colors.white.withValues(alpha: 0.3)),
           Expanded(
             child: _summaryItem(
-              '${DummyDues.unpaidCount}',
-              'Belum Bayar',
+              '$unpaid',
+              'Belum Lunas',
               Icons.cancel_rounded,
               Colors.redAccent,
             ),
@@ -125,8 +125,7 @@ class _DuesScreenState extends ConsumerState<DuesScreen> {
     );
   }
 
-  Widget _summaryItem(
-      String value, String label, IconData icon, Color color) {
+  Widget _summaryItem(String value, String label, IconData icon, Color color) {
     return Column(
       children: [
         Row(
@@ -148,7 +147,7 @@ class _DuesScreenState extends ConsumerState<DuesScreen> {
           label,
           style: TextStyle(
             fontSize: 11,
-            color: Colors.white.withOpacity(0.8),
+            color: Colors.white.withValues(alpha: 0.8),
           ),
         ),
       ],
@@ -158,9 +157,9 @@ class _DuesScreenState extends ConsumerState<DuesScreen> {
   Widget _buildFilterChips() {
     final filters = [
       (null, 'Semua'),
-      (DueStatus.paid, 'Lunas'),
-      (DueStatus.unpaid, 'Belum Lunas'),
-      (DueStatus.pending, 'Menunggu'),
+      (BillStatus.paid, 'Lunas'),
+      (BillStatus.unpaid, 'Belum Lunas'),
+      (BillStatus.pending, 'Menunggu'),
     ];
 
     return Container(
@@ -177,7 +176,7 @@ class _DuesScreenState extends ConsumerState<DuesScreen> {
               label: Text(f.$2),
               selected: isSelected,
               onSelected: (_) => setState(() => _filterStatus = f.$1),
-              selectedColor: AppColors.primary.withOpacity(0.15),
+              selectedColor: AppColors.primary.withValues(alpha: 0.15),
               checkmarkColor: AppColors.primary,
               labelStyle: TextStyle(
                 color: isSelected ? AppColors.primary : AppColors.textSecondary,
@@ -195,7 +194,24 @@ class _DuesScreenState extends ConsumerState<DuesScreen> {
     );
   }
 
-  Widget _buildDueCard(DueModel due) {
+  Widget _buildBillCard(BillModel bill) {
+    Color statusColor;
+    String statusText;
+    switch (bill.status) {
+      case BillStatus.paid:
+        statusColor = AppColors.primary;
+        statusText = 'Lunas';
+        break;
+      case BillStatus.pending:
+        statusColor = AppColors.info;
+        statusText = 'Menunggu Konfirmasi';
+        break;
+      case BillStatus.unpaid:
+        statusColor = AppColors.error;
+        statusText = 'Belum Lunas';
+        break;
+    }
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -209,18 +225,11 @@ class _DuesScreenState extends ConsumerState<DuesScreen> {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Center(
-              child: Text(
-                due.residentName[0],
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
-                ),
-              ),
+            child: const Center(
+              child: Icon(Icons.receipt_long_rounded, color: AppColors.primary),
             ),
           ),
           const SizedBox(width: 14),
@@ -229,7 +238,7 @@ class _DuesScreenState extends ConsumerState<DuesScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  due.residentName,
+                  'Iuran Bulan ${bill.month}/${bill.year}',
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -238,25 +247,54 @@ class _DuesScreenState extends ConsumerState<DuesScreen> {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  '${due.houseNumber} • ${due.monthLabel}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  CurrencyFormatter.format(due.amount),
+                  CurrencyFormatter.format(bill.amount),
                   style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ],
             ),
           ),
-          StatusBadge(status: due.status),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  statusText,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: statusColor,
+                  ),
+                ),
+              ),
+              if (bill.status == BillStatus.unpaid) ...[
+                const SizedBox(height: 8),
+                SizedBox(
+                  height: 28,
+                  child: FilledButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Form Upload Bukti Transfer (Dummy)')),
+                      );
+                    },
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                    ),
+                    child: const Text('Bayar'),
+                  ),
+                ),
+              ]
+            ],
+          ),
         ],
       ),
     );

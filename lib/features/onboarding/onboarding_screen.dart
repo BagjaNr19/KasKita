@@ -73,7 +73,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   if (_currentPage < _pages.length - 1)
                     TextButton(
                       onPressed: _skip,
-                      child: Text(
+                      child: const Text(
                         'Lewati',
                         style: TextStyle(
                           color: AppColors.textSecondary,

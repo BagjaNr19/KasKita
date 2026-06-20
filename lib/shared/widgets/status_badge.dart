@@ -1,38 +1,42 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
-import '../../data/models/due_model.dart';
+import '../../data/models/bill_model.dart';
 
 class StatusBadge extends StatelessWidget {
-  final DueStatus status;
+  final BillStatus status;
 
   const StatusBadge({super.key, required this.status});
 
   @override
   Widget build(BuildContext context) {
-    final Color color;
-    final IconData icon;
+    Color color;
+    IconData icon;
+    String label;
 
     switch (status) {
-      case DueStatus.paid:
+      case BillStatus.paid:
         color = AppColors.success;
         icon = Icons.check_circle_rounded;
+        label = 'Lunas';
         break;
-      case DueStatus.unpaid:
+      case BillStatus.unpaid:
         color = AppColors.error;
         icon = Icons.cancel_rounded;
+        label = 'Belum Lunas';
         break;
-      case DueStatus.pending:
+      case BillStatus.pending:
         color = AppColors.warning;
         icon = Icons.pending_rounded;
+        label = 'Menunggu';
         break;
     }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -40,7 +44,7 @@ class StatusBadge extends StatelessWidget {
           Icon(icon, size: 13, color: color),
           const SizedBox(width: 4),
           Text(
-            status.label,
+            label,
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -70,7 +74,7 @@ class GeneralStatusBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(

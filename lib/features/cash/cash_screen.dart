@@ -6,23 +6,22 @@ import '../../core/constants/app_routes.dart';
 import '../../data/models/app_user.dart';
 import '../../data/models/transaction_model.dart';
 import '../../data/dummy/dummy_transactions.dart';
-import '../../features/auth/auth_provider.dart';
+import '../auth/auth_provider.dart';
 import '../../shared/widgets/recent_transaction_card.dart';
 import '../../shared/widgets/empty_state.dart';
 import '../../shared/widgets/custom_bottom_nav.dart';
 
 enum _Filter { all, income, expense, thisMonth }
 
-class TransactionsScreen extends ConsumerStatefulWidget {
-  const TransactionsScreen({super.key});
+class CashScreen extends ConsumerStatefulWidget {
+  const CashScreen({super.key});
 
   @override
-  ConsumerState<TransactionsScreen> createState() => _TransactionsScreenState();
+  ConsumerState<CashScreen> createState() => _CashScreenState();
 }
 
-class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
+class _CashScreenState extends ConsumerState<CashScreen> {
   _Filter _filter = _Filter.all;
-  final int _navIndex = 1;
 
   List<TransactionModel> get _filtered {
     final now = DateTime.now();
@@ -45,10 +44,16 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
   }
 
   void _onNavTap(int index, UserRole role) {
-    if (index == 1) return;
-    if (role == UserRole.bendahara) {
+    if (role == UserRole.admin) {
       if (index == 0) context.go(AppRoutes.dashboard);
-      if (index == 2) context.go(AppRoutes.billing);
+      if (index == 1) context.go(AppRoutes.residents);
+      if (index == 2) return;
+      if (index == 3) context.go(AppRoutes.reports);
+      if (index == 4) context.go(AppRoutes.profile);
+    } else if (role == UserRole.warga) {
+      if (index == 0) context.go(AppRoutes.dashboard);
+      if (index == 1) return;
+      if (index == 2) context.go(AppRoutes.dues);
       if (index == 3) context.go(AppRoutes.reports);
       if (index == 4) context.go(AppRoutes.profile);
     }
@@ -60,29 +65,15 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
     if (user == null) return const Scaffold();
 
     final transactions = _filtered;
+    // Admin uses index 2 for Kas, Warga uses index 1
+    final navIndex = user.role == UserRole.admin ? 2 : 1;
 
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Transaksi'),
+        title: const Text('Data Kas'),
         backgroundColor: AppColors.background,
         automaticallyImplyLeading: false,
-        actions: [
-          if (user.role.canAddTransaction)
-            Padding(
-              padding: const EdgeInsets.only(right: 16),
-              child: FilledButton.icon(
-                onPressed: () => context.push(AppRoutes.addTransaction),
-                icon: const Icon(Icons.add_rounded, size: 18),
-                label: const Text('Tambah'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                  textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                ),
-              ),
-            ),
-        ],
       ),
       body: Column(
         children: [
@@ -90,9 +81,9 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
           Expanded(
             child: transactions.isEmpty
                 ? const EmptyState(
-                    icon: Icons.receipt_long_rounded,
-                    title: 'Tidak ada transaksi',
-                    subtitle: 'Belum ada transaksi pada filter ini.',
+                    icon: Icons.account_balance_wallet_rounded,
+                    title: 'Tidak ada data kas',
+                    subtitle: 'Belum ada riwayat transaksi.',
                   )
                 : ListView.separated(
                     padding: const EdgeInsets.all(20),
@@ -110,7 +101,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
         ],
       ),
       bottomNavigationBar: CustomBottomNav(
-        currentIndex: _navIndex,
+        currentIndex: navIndex,
         onTap: (i) => _onNavTap(i, user.role),
         role: user.role,
       ),

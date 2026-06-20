@@ -34,9 +34,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
       case UserRole.bendahara:
         user = DummyUsers.bendahara;
         break;
-      case UserRole.ketua:
-        user = DummyUsers.ketua;
-        break;
       case UserRole.admin:
         user = DummyUsers.admin;
         break;

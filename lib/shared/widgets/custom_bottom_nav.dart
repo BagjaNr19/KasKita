@@ -1,33 +1,60 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/constants/app_strings.dart';
+import '../../data/models/app_user.dart';
 
 class CustomBottomNav extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
+  final UserRole role;
 
   const CustomBottomNav({
     super.key,
     required this.currentIndex,
     required this.onTap,
+    required this.role,
   });
 
   @override
   Widget build(BuildContext context) {
-    final items = [
-      (icon: Icons.home_rounded, label: AppStrings.navHome),
-      (icon: Icons.receipt_long_rounded, label: AppStrings.navTransactions),
-      (icon: Icons.people_alt_rounded, label: AppStrings.navDues),
-      (icon: Icons.bar_chart_rounded, label: AppStrings.navReports),
-      (icon: Icons.person_rounded, label: AppStrings.navProfile),
-    ];
+    List<({IconData icon, String label})> items = [];
+
+    switch (role) {
+      case UserRole.admin:
+        items = [
+          (icon: Icons.home_rounded, label: AppStrings.navHome),
+          (icon: Icons.people_alt_rounded, label: AppStrings.navResidents),
+          (icon: Icons.account_balance_wallet_rounded, label: AppStrings.navCash),
+          (icon: Icons.bar_chart_rounded, label: AppStrings.navReports),
+          (icon: Icons.person_rounded, label: AppStrings.navProfile),
+        ];
+        break;
+      case UserRole.bendahara:
+        items = [
+          (icon: Icons.home_rounded, label: AppStrings.navHome),
+          (icon: Icons.receipt_long_rounded, label: AppStrings.navTransactions),
+          (icon: Icons.request_quote_rounded, label: AppStrings.navBilling),
+          (icon: Icons.bar_chart_rounded, label: AppStrings.navReports),
+          (icon: Icons.person_rounded, label: AppStrings.navProfile),
+        ];
+        break;
+      case UserRole.warga:
+        items = [
+          (icon: Icons.home_rounded, label: AppStrings.navHome),
+          (icon: Icons.account_balance_wallet_rounded, label: AppStrings.navCash),
+          (icon: Icons.payment_rounded, label: AppStrings.navDues),
+          (icon: Icons.bar_chart_rounded, label: AppStrings.navReports),
+          (icon: Icons.person_rounded, label: AppStrings.navProfile),
+        ];
+        break;
+    }
 
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 20,
             offset: const Offset(0, -4),
           ),
@@ -46,7 +73,7 @@ class CustomBottomNav extends StatelessWidget {
               return Expanded(
                 child: InkWell(
                   onTap: () => onTap(i),
-                  splashColor: AppColors.primary.withOpacity(0.08),
+                  splashColor: AppColors.primary.withValues(alpha: 0.08),
                   highlightColor: Colors.transparent,
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
@@ -59,7 +86,7 @@ class CustomBottomNav extends StatelessWidget {
                               horizontal: 14, vertical: 6),
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? AppColors.primary.withOpacity(0.12)
+                                ? AppColors.primary.withValues(alpha: 0.12)
                                 : Colors.transparent,
                             borderRadius: BorderRadius.circular(20),
                           ),

@@ -35,8 +35,8 @@ class RecentTransactionCard extends StatelessWidget {
               height: 44,
               decoration: BoxDecoration(
                 color: isIncome
-                    ? AppColors.income.withOpacity(0.1)
-                    : AppColors.expense.withOpacity(0.1),
+                    ? AppColors.income.withValues(alpha: 0.1)
+                    : AppColors.expense.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -88,8 +88,8 @@ class RecentTransactionCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                   decoration: BoxDecoration(
                     color: transaction.hasProof
-                        ? AppColors.success.withOpacity(0.1)
-                        : AppColors.warning.withOpacity(0.1),
+                        ? AppColors.success.withValues(alpha: 0.1)
+                        : AppColors.warning.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(

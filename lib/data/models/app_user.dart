@@ -1,27 +1,23 @@
-enum UserRole { warga, bendahara, ketua, admin }
+enum UserRole { admin, bendahara, warga }
 
 extension UserRoleExtension on UserRole {
   String get label {
     switch (this) {
-      case UserRole.warga:
-        return 'Warga';
+      case UserRole.admin:
+        return 'Admin / RT';
       case UserRole.bendahara:
         return 'Bendahara';
-      case UserRole.ketua:
-        return 'Ketua RT/RW';
-      case UserRole.admin:
-        return 'Admin';
+      case UserRole.warga:
+        return 'Warga';
     }
   }
 
-  bool get canAddTransaction =>
-      this == UserRole.bendahara || this == UserRole.admin;
-  bool get canManageDues =>
-      this == UserRole.bendahara || this == UserRole.admin;
-  bool get canExportReport =>
-      this == UserRole.bendahara ||
-      this == UserRole.ketua ||
-      this == UserRole.admin;
+  bool get isAdmin => this == UserRole.admin;
+  bool get isBendahara => this == UserRole.bendahara;
+  bool get isWarga => this == UserRole.warga;
+  
+  bool get canAddTransaction => this == UserRole.bendahara;
+  bool get canExportReport => this == UserRole.admin || this == UserRole.bendahara;
 }
 
 class AppUser {
@@ -29,23 +25,24 @@ class AppUser {
   final String name;
   final String email;
   final UserRole role;
-  final String rtRw;
-  final String houseNumber;
+  final String? houseNumber;
   final String? phoneNumber;
   final String? avatarInitials;
+  final String rtRw; // Added back for profile info
 
   const AppUser({
     required this.id,
     required this.name,
     required this.email,
     required this.role,
-    required this.rtRw,
-    required this.houseNumber,
+    this.houseNumber,
     this.phoneNumber,
     this.avatarInitials,
+    this.rtRw = 'RT 01 / RW 01', // Default
   });
 
   String get initials {
+    if (avatarInitials != null) return avatarInitials!;
     final parts = name.split(' ');
     if (parts.length >= 2) {
       return '${parts[0][0]}${parts[1][0]}'.toUpperCase();

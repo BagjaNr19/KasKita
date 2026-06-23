@@ -1,18 +1,21 @@
 class AppStrings {
   static const String appName = 'Kaskita';
-  static const String appTagline = 'Kas warga lebih mudah dan transparan';
+  static const String appTagline = 'Transparansi kas RT dalam genggaman';
+  static const String appDescription =
+      'Aplikasi pencatatan dan transparansi kas RT yang dirancang untuk satu lingkungan RT. '
+      'Memudahkan pengelolaan keuangan agar lebih rapi, transparan, dan mudah dipantau oleh seluruh warga.';
 
-  // Onboarding
+  // Onboarding / Welcome Info
   static const List<String> onboardingTitles = [
-    'Pantau Kas RT\ndengan Mudah',
-    'Lihat Pemasukan & Pengeluaran\nSecara Transparan',
-    'Iuran Warga Lebih Rapi\ndan Terpantau',
+    'Selamat Datang\ndi Kaskita',
+    'Fitur Unggulan',
+    'Siapa Saja\nyang Menggunakan?',
   ];
 
   static const List<String> onboardingDescriptions = [
-    'Kelola dan pantau kondisi keuangan RT kapan saja dan di mana saja dengan mudah.',
-    'Semua transaksi pemasukan dan pengeluaran tercatat rapi dan dapat dilihat oleh semua warga.',
-    'Pantau status iuran warga secara real-time, lengkap dengan riwayat pembayaran.',
+    'Kaskita adalah aplikasi pencatatan dan transparansi kas RT yang dirancang untuk satu lingkungan RT.',
+    'Semua yang dibutuhkan untuk mengelola kas RT tersedia dalam satu aplikasi.',
+    'Tiga peran utama dalam sistem KasKita untuk mengelola keuangan RT.',
   ];
 
   // Navigation
